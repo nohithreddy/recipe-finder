@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recipe Search</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #fff;
+            color: #000;
+        }
+
+        h1 {
+            text-align: center;
+            margin-top: 30px;
+            color: #fff;
+        }
+
+        .upper-body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .quote {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .srch-box {
+            margin-bottom: 20px;
+        }
+
+        #search {
+            padding: 10px;
+            border: 1px solid #fff;
+            border-radius: 5px;
+            width: 300px;
+            max-width: 100%;
+            color: #000;
+            background-color: #fff;
+        }
+
+        .srch-btn {
+            padding: 10px 15px;
+            background-color: #ff0000;
+            border: none;
+            border-radius: 5px;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        .srch-btn:hover {
+            background-color: #0056b3;
+        }
+
+        .lower-body {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .ingredients {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            grid-gap: 20px;
+        }
+
+        .instructions {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .instructions.active {
+            display: flex;
+        }
+
+        .steps {
+            background-color: #000;
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 80%;
+            overflow-y: auto;
+            color: #fff;
+        }
+
+        #close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            cursor: pointer;
+            font-size: 24px;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <h1>Find Meals For Your Ingredient</h1>
+    <div class="upper-body">
+        <section class="quote">
+            <p>Real food doesn't have ingredients, real food is ingredients.</p>
+            <h3>-Jamie Oliver</h3>
+        </section>
+        <div class="srch-box">
+            <input type="search" name="search" id="search" placeholder="Enter an ingredient...">
+            <button class="srch-btn">Search</button>
+        </div>
+    </div>
+    <div class="lower-body">
+        <h2>Your Search Results:</h2>
+        <div class="ingredients">
+            function getIngredient() {
+                input = document.querySelector('#search').value.trim();
+                let item = "";
+            
+                const apiId = '50dcfd9c';
+                const apiKey = '883eb59218ddca9367797e3a4ea1abc0';
+            
+                fetch(`https://api.edamam.com/search?q=${input}&app_id=${apiId}&app_key=${apiKey}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('API Response:', data); // Debugging statement
+            
+                        if (data.hits && data.hits.length > 0) {
+                            data.hits.forEach(hit => {
+                                let meal = hit.recipe;
+                                let ingredient = `
+                                    <div class="item" data-id='${meal.uri}'>
+                                        <picture class="image">
+                                            <img src="${meal.image}">
+                                        </picture>
+                                        <section class="info">
+                                            <h2>${meal.label}</h2>
+                                            <button class="btn">Get Recipe</button>
+                                        </section>
+                                    </div>`;
+                                item += ingredient;
+                                document.querySelector('.ingredients').innerHTML = item;
+                            });
+                        } else {
+                            item = "No Recipe Found!";
+                            document.querySelector('.ingredients').innerHTML = item;
+                        }
+                    })
+                    .catch(error => console.error('Error fetching data:', error));
+            }
+            
+        </div>
+    </div>
+
+    <div class="instructions">
+        <span id="close">&#10005;</span>
